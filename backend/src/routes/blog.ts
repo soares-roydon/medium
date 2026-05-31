@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { verify } from "hono/jwt";
 import { PrismaClient } from "../generated/prisma/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
+import { createBlogInput, updateBlogInput } from "@roydon-soares/medium-common";
 
 // Added generic types for env & storing userId
 const blogRouter = new Hono<{
@@ -28,7 +29,6 @@ blogRouter.use("/*", async (c, next) => {
 
     c.set("userId", payload.id as string);
     await next();
-    
   } catch (e) {
     c.status(403);
     return c.json({ message: "Unauthorized" });
@@ -44,11 +44,18 @@ blogRouter.post("/", async (c) => {
 
   const body = await c.req.json();
 
+  const { success, data } = createBlogInput.safeParse(body);
+
+  if (!success) {
+    c.status(400);
+    return c.json({ message: "Invalid input" });
+  }
+
   const blog = await prisma.post.create({
     data: {
-      title: body.title,
-      content: body.content,
-      published: body.published,
+      title: data.title,
+      content: data.content,
+      published: data.published,
       authorId: c.get("userId"),
     },
   });
@@ -64,12 +71,19 @@ blogRouter.put("/:id", async (c) => {
 
   const body = await c.req.json();
 
+  const { success, data } = updateBlogInput.safeParse(body);
+
+  if (!success) {
+    c.status(400);
+    return c.json({ message: "Invalid input" });
+  }
+
   try {
     const blog = await prisma.post.update({
       data: {
-        title: body.title,
-        content: body.content,
-        published: body.published,
+        title: data.title,
+        content: data.content,
+        published: data.published,
       },
       where: {
         id: c.req.param("id"),

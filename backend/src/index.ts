@@ -5,7 +5,7 @@ import { blogRouter } from "./routes/blog";
 
 const app = new Hono().basePath("/api/v1");
 
-app.use("/api/v1/*", cors())
+app.use("*", cors())
 
 app.route("/user", userRouter)
 app.route("/blog", blogRouter)

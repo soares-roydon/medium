@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { PrismaClient } from "../generated/prisma/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { sign } from "hono/jwt";
-import { signupInput } from "@roydon-soares/medium-common";
+import { signinInput, signupInput } from "@roydon-soares/medium-common";
 
 export const userRouter = new Hono<{
   Bindings: {
@@ -53,7 +53,7 @@ userRouter.post("/signin", async (c) => {
 
   const body = await c.req.json();
 
-  const { success, data } = signupInput.safeParse(body)
+  const { success, data } = signinInput.safeParse(body)
 
   if(!success) {
     c.status(400)

@@ -14,6 +14,55 @@ function Auth({ type }: { type: "signup" | "signin" }) {
     password: "",
   });
 
+  async function handleAuth() {
+    if (type === "signup") {
+      const { name, email, password } = postSignupInput;
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json()
+
+      if(!response.ok) {
+        alert("Something went wrong, please try again")
+      }
+
+      localStorage.setItem("token", data.token)
+      alert("Signed up successfully")
+    }
+
+    if (type === "signin") {
+      const { email, password } = postSigninInput;
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signin`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json()
+
+      if(!response.ok) {
+        alert("Something went wrong, please try again")
+      }
+
+      localStorage.setItem("token", data.token)
+      alert("Signed in successfully")
+    }
+  }
+
   return (
     <>
       <div className="flex justify-center items-center h-screen">
@@ -82,7 +131,10 @@ function Auth({ type }: { type: "signup" | "signin" }) {
               />
             </div>
           )}
-          <button className="flex justify-center items-center bg-blue-500 py-1 w-full border border-zinc-500 rounded text-white cursor-pointer hover:bg-blue-600">
+          <button
+            className="flex justify-center items-center bg-blue-500 py-1 w-full border border-zinc-500 rounded text-white cursor-pointer hover:bg-blue-600"
+            onClick={handleAuth}
+          >
             {type === "signup" ? "Sign up" : "Sign in"}
           </button>
           <div className="flex justify-center mt-3 mb-1">

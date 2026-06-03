@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "./Input";
 import { useState } from "react";
 import type { SigninInput, SignupInput } from "@roydon-soares/medium-common";
@@ -14,59 +14,69 @@ function Auth({ type }: { type: "signup" | "signin" }) {
     password: "",
   });
 
+  const navigate = useNavigate();
+
   async function handleAuth() {
     if (type === "signup") {
       const { name, email, password } = postSignupInput;
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+          }),
         },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
-      });
+      );
 
-      const data = await response.json()
+      const data = await response.json();
 
-      if(!response.ok) {
-        alert("Something went wrong, please try again")
+      if (!response.ok) {
+        alert("Something went wrong, please try again");
       }
 
-      localStorage.setItem("token", data.token)
-      alert("Signed up successfully")
+      localStorage.setItem("token", data.token);
+      alert("Signed up successfully");
+      navigate("/blogs");
     }
 
     if (type === "signin") {
       const { email, password } = postSigninInput;
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signin`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signin`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
         },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      );
 
-      const data = await response.json()
+      const data = await response.json();
 
-      if(!response.ok) {
-        alert("Something went wrong, please try again")
+      if (!response.ok) {
+        alert("Something went wrong, please try again");
       }
 
-      localStorage.setItem("token", data.token)
-      alert("Signed in successfully")
+      localStorage.setItem("token", data.token);
+      alert("Signed in successfully");
+      navigate("/blogs");
     }
   }
 
   return (
     <>
       <div className="flex justify-center items-center h-screen">
-        <div className="rounded shadow-md px-6 py-4 w-96">
+        <div className="border border-slate-200 rounded-lg shadow px-6 py-4 w-96">
           <div className="text-3xl font-bold text-center mb-7">
             {type === "signup" ? "Create an account" : "Welcome back"}
           </div>
@@ -132,7 +142,7 @@ function Auth({ type }: { type: "signup" | "signin" }) {
             </div>
           )}
           <button
-            className="flex justify-center items-center bg-blue-500 py-1 w-full border border-zinc-500 rounded text-white cursor-pointer hover:bg-blue-600"
+            className="flex justify-center items-center bg-blue-500 py-1 mt-4 w-full border border-zinc-500 rounded text-white cursor-pointer hover:bg-blue-600"
             onClick={handleAuth}
           >
             {type === "signup" ? "Sign up" : "Sign in"}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-interface Blogs {
+interface Blog {
   id: string;
   title: string;
   content: string;
@@ -12,7 +12,7 @@ interface Blogs {
 
 function useBlogs() {
   const [loading, setLoading] = useState(true);
-  const [blogs, setBlogs] = useState<Blogs[]>([]);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/blog/bulk`, {
@@ -35,4 +35,29 @@ function useBlogs() {
   return { blogs, loading };
 }
 
-export { useBlogs };
+function useBlog(id: string) {
+  const [loading, setLoading] = useState(true);
+  const [blog, setBlog] = useState<Blog>();
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/blog/${id}`, {
+      headers: {
+        authorization: `bearer ${localStorage.getItem("token")}`,
+      },
+    }).then(async (response) => {
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message);
+        return;
+      }
+
+      setBlog(data.blog);
+      setLoading(false);
+    });
+  }, []);
+
+  return { loading, blog };
+}
+
+export { useBlogs, useBlog };
